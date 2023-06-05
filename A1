@@ -1,0 +1,73 @@
+class HashTable:
+    def __init__(self, size):
+        self.size = size
+        self.table = [None] * size
+
+    def hash_function(self, key):
+        return sum(ord(c) for c in key) % self.size
+
+    def separate_chaining_insert(self, key, value):
+        index = self.hash_function(key)
+        if self.table[index] is None:
+            self.table[index] = []
+        self.table[index].append((key, value))
+
+    def separate_chaining_search(self, key):
+        index = self.hash_function(key)
+        if self.table[index] is not None:
+            for item in self.table[index]:
+                if item[0] == key:
+                    return item[1]
+        return None
+
+    def open_addressing_insert(self, key, value):
+        index = self.hash_function(key)
+        while self.table[index] is not None:
+            index = (index + 1) % self.size
+        self.table[index] = (key, value)
+
+    def open_addressing_search(self, key):
+        index = self.hash_function(key)
+        start_index = index
+        while self.table[index] is not None:
+            if self.table[index][0] == key:
+                return self.table[index][1]
+            index = (index + 1) % self.size
+            if index == start_index:
+                break
+        return None
+
+
+# Example usage with user input
+n = int(input("Enter the number of clients: "))
+
+# Creating hash tables with separate chaining and open addressing
+hash_table_separate_chaining = HashTable(n)
+hash_table_open_addressing = HashTable(n)
+
+# Adding clients and telephone numbers to hash tables
+for i in range(n):
+    name = input(f"Enter the name of client {i+1}: ")
+    telephone = input(f"Enter the telephone number of client {i+1}: ")
+
+    hash_table_separate_chaining.separate_chaining_insert(name, telephone)
+    hash_table_open_addressing.open_addressing_insert(name, telephone)
+
+# Searching for telephone numbers
+while True:
+    search_name = input("\nEnter the name of the client to search (or 'exit' to quit): ")
+    if search_name == 'exit':
+        break
+
+    telephone_separate_chaining = hash_table_separate_chaining.separate_chaining_search(search_name)
+    telephone_open_addressing = hash_table_open_addressing.open_addressing_search(search_name)
+
+    if telephone_separate_chaining is not None:
+        print(f"Telephone number using separate chaining: {telephone_separate_chaining}")
+    else:
+        print("Client not found using separate chaining")
+
+    if telephone_open_addressing is not None:
+        print(f"Telephone number using open addressing: {telephone_open_addressing}")
+    else:
+        print("Client not found using open addressing")
